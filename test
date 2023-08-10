@@ -1,0 +1,285 @@
+Function Get-TlsCipherSuite1 {
+    <#
+    .DESCRIPTION
+    Get a list of enabled TLS cipher suites for the server.
+    This is like the Get-TlsCipherSuite cmdlet but works on older Windows
+    versions.
+    #>
+    [OutputType([string])]
+    param ()
+
+    Add-Type -Namespace Bcrypt -Name Native -MemberDefinition @'
+[StructLayout(LayoutKind.Sequential)]
+public struct CRYPT_CONTEXT_FUNCTIONS
+{
+    public int cFunctions;
+    public IntPtr rpgszFunctions;
+}
+
+[DllImport("Bcrypt.dll", EntryPoint = "BCryptEnumContextFunctions", CharSet = CharSet.Unicode)]
+private static extern int NativeBCryptEnumContextFunctions(
+    int dwTable,
+    string pszContext,
+    int dwInterface,
+    ref int pcbBuffer,
+    ref IntPtr ppBuffer);
+
+public static IntPtr BCryptEnumContextFunctions(string context, int interfaceId)
+{
+    int length = 0;
+    IntPtr buffer = IntPtr.Zero;
+    int res = NativeBCryptEnumContextFunctions(
+        1, // CRYPT_LOCAL
+        context,
+        interfaceId,
+        ref length,
+        ref buffer);
+    if (res != 0)
+    {
+        throw new System.ComponentModel.Win32Exception(res);
+    }
+
+    return buffer;
+}
+
+[DllImport("Bcrypt.dll")]
+public static extern void BCryptFreeBuffer(
+    IntPtr pvBuffer);
+'@
+
+    $NCRYPT_SCHANNEL_INTERFACE = 0x00010002
+    $buffer = [Bcrypt.Native]::BCryptEnumContextFunctions("SSL", $NCRYPT_SCHANNEL_INTERFACE)
+    try {
+        $context = [System.Runtime.InteropServices.Marshal]::PtrToStructure($buffer, [type][Bcrypt.Native+CRYPT_CONTEXT_FUNCTIONS])
+        $cipherPtr = $context.rpgszFunctions
+        for ($i = 0; $i -lt $context.cFunctions; $i++) {
+            [System.Runtime.InteropServices.Marshal]::PtrToStringUni(
+                [System.Runtime.InteropServices.Marshal]::ReadIntPtr($cipherPtr))
+            $cipherPtr = [IntPtr]::Add($cipherPtr, [IntPtr]::Size)
+        }
+    }
+    finally {
+        [Bcrypt.Native]::BCryptFreeBuffer($buffer)
+    }
+}
+
+function Create-ExcelWorkbook {
+    param (
+        [string]$filePath
+    )
+
+    # Check if the file already exists
+    if (-not (Test-Path -Path $filePath)) {
+        # Load Excel COM object
+        $excel = New-Object -ComObject Excel.Application
+
+        try {
+            # Disable alerts and display alerts
+            $excel.DisplayAlerts = $false
+            $excel.Visible = $true
+
+            # Create a new workbook with worksheets
+            $workbook = $excel.Workbooks.Add()
+            $worksheet1 = $workbook.Worksheets.Add()
+            $worksheet2 = $workbook.Worksheets.Add()
+            #$worksheet3 = $workbook.Worksheets.Add()
+            #$worksheet4 = $workbook.Worksheets.Add()
+            #$worksheet5 = $workbook.Worksheets.Add()
+            #$worksheet6 = $workbook.Worksheets.Add()
+            #$worksheet7 = $workbook.Worksheets.Add()
+            #$worksheet8 = $workbook.Worksheets.Add()
+            #$worksheet9 = $workbook.Worksheets.Add()
+            #$worksheet10 = $workbook.Worksheets.Add()
+
+            # Rename each worksheet
+            $worksheet1.Name = "Ciphers"
+            $worksheet2.Name = "Diskspace"
+            #$worksheet3.Name = "DriveSize"
+            #$worksheet4.Name = "InstalledSoftwares"
+            #$worksheet5.Name = "Memory"
+            #$worksheet6.Name = "OpenPorts"
+            #$worksheet7.Name = "OSPatches"
+            #$worksheet8.Name = "Process"
+            #$worksheet9.Name = "processor"
+            #$worksheet10.Name = "Services"
+
+            # Save the workbook
+            $workbook.SaveAs($filePath)
+        }
+        finally {
+            # Close the workbook and Excel
+            if ($workbook) {
+                $workbook.Close()
+            }
+            if ($excel) {
+                $excel.Quit()
+                [System.Runtime.Interopservices.Marshal]::ReleaseComObject($excel)
+            }
+        }
+    }
+    else {
+        Write-Host "File already exists: $filePath"
+    }
+}
+
+
+$scriptBlock = {
+
+$result = New-Object PSObject -Property @{
+Ciphers = Get-TlsCipherSuite
+Diskspace = Get-PSDrive | Where-Object {$_.Used -gt 0} | Select-Object Name, Used, Free, Provider
+DriveSize = Get-CimInstance Win32_LogicalDisk | Select-Object DeviceID, Size, FreeSpace
+InstalledSoftwares = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Select-Object DisplayName, DisplayVersion
+Memory = Get-CimInstance Win32_ComputerSystem | Select-Object @{Name="TotalPhysicalMemory(GB)";Expression={[math]::Round($_.TotalPhysicalMemory/1GB)}}
+OpenPorts = Get-NetTCPConnection -State Listen | Select-Object LocalAddress, LocalPort
+OSPatches = Get-Hotfix | Select-Object HotFixID, InstalledOn        
+Process = Get-Process | Select-Object Name, ID, CPU, StartTime
+processor = Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores, NumberOfLogicalProcessors
+Services = Get-Service | Select-Object Name, Status, StartType        
+        
+    }
+    $result
+
+}
+
+$data = @()
+    
+    
+$t = 1
+
+Import-Csv 'C:\Users\LoggedinUSer\Desktop\hosts.csv' |Select-Object -First 2 | ForEach-Object{
+
+        $remoteComputer = $_.Hostname
+
+        $data = Invoke-Command -ScriptBlock $scriptBlock
+
+
+# Usage example
+    $filePath = "C:\Users\LoggedinUSer\Desktop\File.xlsx"
+    if (-not (Test-Path $filePath)) {
+        Write-Host "File doesn't exist, create it"
+
+        Create-ExcelWorkbook -filePath $filePath
+    } else {
+        Write-Host "File already exists: $filePath"
+    }
+
+
+
+   # $data.services | Export-Csv -Path "C:\Users\LoggedinUSer\Desktop\services.csv" -NoTypeInformation
+    $data | Get-Member | Where-object {$_.MemberType -eq 'NoteProperty'} |Select-Object -ExpandProperty Name -First 2 | ForEach-Object{
+    $data."$_" | Export-Csv -Path "C:\Users\LoggedinUSer\Desktop\$($_).csv" -NoTypeInformation
+    
+    $csv = Import-Csv "C:\Users\LoggedinUSer\Desktop\$($_).csv"
+    $excel = New-Object -ComObject Excel.Application
+    
+    $workbook = $excel.Workbooks.Open($filepath)
+    $worksheet = $workbook.Worksheets.Item($_)
+    
+
+    
+    $columnNames = $csv | Get-Member | Where-Object {$_.MemberType -eq 'NoteProperty'} | Select-Object -ExpandProperty Name
+    $row = 3
+    $worksheet.Cells.Item(1, $t) = hostname
+    # Set the headings of the worksheet to the column names
+        for ($u = $t -1; $u -lt $columnNames.Count; $u++) {
+
+
+
+        #$worksheet.Cells.Item(2, $u + 1) = $columnNames[$u]
+
+
+        
+        
+        }
+    
+    
+    #$worksheet.Cells.Item($row, $col) = $t
+    foreach($data1 in $csv) {
+    $col = $t
+    foreach($item in $data1.PSObject.Properties) {
+        $worksheet.Cells.Item($row, $col).Value2
+
+        
+
+        $worksheet.Cells.Item($row, $col) = $item.Value
+            # Get the cell A1
+        
+
+
+    $col++
+    }
+    $row++
+    }
+
+
+
+    $workbook.Save()
+    #$workbook.SaveAs($filepath)
+    $workbook.Close()
+    $excel.Quit()
+    [System.Runtime.Interopservices.Marshal]::ReleaseComObject($excel)
+    
+    }
+    $row = 0
+    $t = $t+20
+
+
+}
+
+
+
+$filePath = "C:\Users\LoggedinUSer\Desktop\File.xlsx"
+# Load the Excel Application COM object
+$excel = New-Object -ComObject Excel.Application
+
+# Open the Excel file
+$workbook = $excel.Workbooks.Open($filepath)
+
+# Loop through each worksheet in the workbook
+foreach ($worksheet in $workbook.Worksheets) {
+
+# Get the name of the worksheet
+# Get the worksheet you want to read from
+$worksheet = $workbook.Worksheets.Item($worksheet.Name)
+
+$worksheet.Name
+$columnCount = $worksheet.UsedRange.Columns.Count
+$columnCount
+$rowCount = $worksheet.UsedRange.Rows.Count
+$rowCount
+
+$row = 3
+
+
+
+for ($u = 0; $u -lt $($rowCount -2); $u++) {
+$Col = 21
+for ($k = 0; $k -lt $($columnCount - 20); $k++) {
+
+if($worksheet.Cells.Item($row, $Col).Value2 -eq $worksheet.Cells.Item($Row, $($Col-20)).Value2){
+
+Write-Host $($worksheet.Cells.Item($Row, $Col).Value2)
+
+        $cell = $worksheet.Cells.Item($row, $Col)
+        $cell.Interior.Color = 65280
+
+}Else{
+Write-Host $($worksheet.Cells.Item($Row, $Col).Value2)
+        $cell = $worksheet.Cells.Item($row, $Col)
+        $cell.Interior.Color = 255
+
+}
+$Col++
+}
+
+$row++
+}
+
+
+#>
+}
+$workbook.Save()    
+$workbook.Close()
+$excel.Quit()
+[System.Runtime.Interopservices.Marshal]::ReleaseComObject($excel)
