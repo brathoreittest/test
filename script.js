@@ -30,8 +30,8 @@ function loadVideo() {
         player.loadVideoById({ videoId: videoId, startSeconds: randomTime });
     } else {
         player = new YT.Player('player', {
-            height: '390',
-            width: '640',
+            height: '100%',
+            width: '100%',
             videoId: videoId,
             playerVars: { 'start': randomTime },
             events: {
