@@ -7,7 +7,7 @@ function onYouTubeIframeAPIReady() {
     fetch('videos.txt')
         .then(response => response.text())
         .then(data => {
-            videoIds = data.split('\n').filter(id => id.trim() !== '');
+            videoIds = data.split('\n').map(id => id.trim()).filter(id => id !== '');
             console.log('Loaded video IDs:', videoIds);
             if (videoIds.length > 0) {
                 loadVideo();
