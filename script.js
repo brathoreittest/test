@@ -23,9 +23,8 @@ function loadVideo() {
         console.error('No video IDs available to load.');
         return;
     }
-    const currentIndex = Math.floor(Math.random() * videoIds.length);
     const videoId = videoIds[currentIndex];
-    const randomTime = Math.floor(Math.random() * 5400); // Random time between 0 and 9000 seconds
+    const randomTime = Math.floor(Math.random() * 5400); // Random time between 0 and 5400 seconds (90 minutes)
     console.log(`Loading video ID: ${videoId} at random time: ${randomTime} seconds`);
     if (player) {
         player.loadVideoById({ videoId: videoId, startSeconds: randomTime });
@@ -36,7 +35,8 @@ function loadVideo() {
             videoId: videoId,
             playerVars: { 'start': randomTime },
             events: {
-                'onReady': onPlayerReady
+                'onReady': onPlayerReady,
+                'onError': onPlayerError
             }
         });
     }
@@ -45,6 +45,20 @@ function loadVideo() {
 function onPlayerReady(event) {
     console.log('Player is ready. Starting video.');
     event.target.playVideo();
+}
+
+function onPlayerError(event) {
+    console.error('Error occurred. Skipping to next video.');
+    loadNextVideo();
+}
+
+function loadNextVideo() {
+    if (videoIds.length === 0) {
+        console.error('No video IDs available for navigation.');
+        return;
+    }
+    currentIndex = (currentIndex + 1) % videoIds.length;
+    loadVideo();
 }
 
 document.getElementById('prevBtn').addEventListener('click', () => {
