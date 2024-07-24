@@ -32,6 +32,7 @@ function loadVideo() {
             height: '100%',
             width: '100%',
             videoId: videoId,
+            playerVars: { 'autoplay': 1, 'playsinline': 1 },
             events: {
                 'onReady': onPlayerReady,
                 'onError': onPlayerError,
@@ -43,6 +44,7 @@ function loadVideo() {
 
 function onPlayerReady(event) {
     console.log('Player is ready.');
+    setVideoQuality();
     const duration = player.getDuration();
     if (duration > 0) {
         const randomTime = Math.floor(Math.random() * duration);
@@ -100,6 +102,19 @@ function loadNextVideo() {
     }
     currentIndex = (currentIndex + 1) % videoIds.length;
     loadVideo();
+}
+
+function setVideoQuality() {
+    const qualityLevels = player.getAvailableQualityLevels();
+    if (qualityLevels.includes('hd1080')) {
+        player.setPlaybackQuality('hd1080');
+    } else if (qualityLevels.includes('hd720')) {
+        player.setPlaybackQuality('hd720');
+    } else if (qualityLevels.includes('large')) { // large is 480p
+        player.setPlaybackQuality('large');
+    } else {
+        console.warn('Desired quality level not available. Default quality will be used.');
+    }
 }
 
 document.getElementById('prevBtn').addEventListener('click', () => {
