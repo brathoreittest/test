@@ -24,27 +24,46 @@ function loadVideo() {
         return;
     }
     const videoId = videoIds[currentIndex];
-    const randomTime = Math.floor(Math.random() * 5400); // Random time between 0 and 5400 seconds (90 minutes)
-    console.log(`Loading video ID: ${videoId} at random time: ${randomTime} seconds`);
+    console.log(`Loading video ID: ${videoId}`);
     if (player) {
-        player.loadVideoById({ videoId: videoId, startSeconds: randomTime });
+        player.loadVideoById(videoId);
     } else {
         player = new YT.Player('player', {
             height: '100%',
             width: '100%',
             videoId: videoId,
-            playerVars: { 'start': randomTime },
             events: {
                 'onReady': onPlayerReady,
-                'onError': onPlayerError
+                'onError': onPlayerError,
+                'onStateChange': onPlayerStateChange
             }
         });
     }
 }
 
 function onPlayerReady(event) {
-    console.log('Player is ready. Starting video.');
-    event.target.playVideo();
+    console.log('Player is ready.');
+    const duration = player.getDuration();
+    if (duration > 0) {
+        const randomTime = Math.floor(Math.random() * duration);
+        console.log(`Starting video at random time: ${randomTime} seconds`);
+        event.target.seekTo(randomTime);
+        event.target.playVideo();
+    } else {
+        console.log('Duration not available yet, waiting...');
+    }
+}
+
+function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.PLAYING) {
+        const duration = player.getDuration();
+        if (duration > 0) {
+            const randomTime = Math.floor(Math.random() * duration);
+            console.log(`Starting video at random time: ${randomTime} seconds`);
+            player.seekTo(randomTime);
+            player.playVideo();
+        }
+    }
 }
 
 function onPlayerError(event) {
@@ -54,17 +73,17 @@ function onPlayerError(event) {
 
 function handlePlayerError(errorCode) {
     switch (errorCode) {
-        case 2: 
+        case 2:
             console.error('Invalid video ID.');
             break;
-        case 5: 
+        case 5:
             console.error('HTML5 player error.');
             break;
-        case 100: 
+        case 100:
             console.error('Video not found or removed.');
             break;
         case 101:
-        case 150: 
+        case 150:
             console.error('Embedding disabled or age-restricted video.');
             break;
         default:
