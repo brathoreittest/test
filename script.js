@@ -24,7 +24,7 @@ function loadVideo() {
         return;
     }
     const videoId = videoIds[currentIndex];
-    const randomTime = Math.floor(Math.random() * 300); // Random time between 0 and 300 seconds
+    const randomTime = Math.floor(Math.random() * 9000); // Random time between 0 and 9000 seconds
     console.log(`Loading video ID: ${videoId} at random time: ${randomTime} seconds`);
     if (player) {
         player.loadVideoById({ videoId: videoId, startSeconds: randomTime });
