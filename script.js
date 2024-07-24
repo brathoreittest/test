@@ -23,28 +23,98 @@ function loadVideo() {
         console.error('No video IDs available to load.');
         return;
     }
-    const currentIndex = Math.floor(Math.random() * videoIds.length);
     const videoId = videoIds[currentIndex];
-    const randomTime = Math.floor(Math.random() * 5400); // Random time between 0 and 9000 seconds
-    console.log(`Loading video ID: ${videoId} at random time: ${randomTime} seconds`);
+    console.log(`Loading video ID: ${videoId}`);
     if (player) {
-        player.loadVideoById({ videoId: videoId, startSeconds: randomTime });
+        player.loadVideoById(videoId);
     } else {
         player = new YT.Player('player', {
             height: '100%',
             width: '100%',
             videoId: videoId,
-            playerVars: { 'start': randomTime },
+            playerVars: { 'autoplay': 1, 'playsinline': 1 },
             events: {
-                'onReady': onPlayerReady
+                'onReady': onPlayerReady,
+                'onError': onPlayerError,
+                'onStateChange': onPlayerStateChange
             }
         });
     }
 }
 
 function onPlayerReady(event) {
-    console.log('Player is ready. Starting video.');
-    event.target.playVideo();
+    console.log('Player is ready.');
+    setVideoQuality();
+    const duration = player.getDuration();
+    if (duration > 0) {
+        const randomTime = Math.floor(Math.random() * duration);
+        console.log(`Starting video at random time: ${randomTime} seconds`);
+        event.target.seekTo(randomTime);
+        event.target.playVideo();
+    } else {
+        console.log('Duration not available yet, waiting...');
+    }
+}
+
+function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.PLAYING) {
+        const duration = player.getDuration();
+        if (duration > 0) {
+            const randomTime = Math.floor(Math.random() * duration);
+            console.log(`Starting video at random time: ${randomTime} seconds`);
+            player.seekTo(randomTime);
+            player.playVideo();
+        }
+    }
+}
+
+function onPlayerError(event) {
+    console.error('Error occurred. Skipping to next video.');
+    handlePlayerError(event.data);
+}
+
+function handlePlayerError(errorCode) {
+    switch (errorCode) {
+        case 2:
+            console.error('Invalid video ID.');
+            break;
+        case 5:
+            console.error('HTML5 player error.');
+            break;
+        case 100:
+            console.error('Video not found or removed.');
+            break;
+        case 101:
+        case 150:
+            console.error('Embedding disabled or age-restricted video.');
+            break;
+        default:
+            console.error('Unknown error.');
+            break;
+    }
+    loadNextVideo();
+}
+
+function loadNextVideo() {
+    if (videoIds.length === 0) {
+        console.error('No video IDs available for navigation.');
+        return;
+    }
+    currentIndex = (currentIndex + 1) % videoIds.length;
+    loadVideo();
+}
+
+function setVideoQuality() {
+    const qualityLevels = player.getAvailableQualityLevels();
+    if (qualityLevels.includes('hd1080')) {
+        player.setPlaybackQuality('hd1080');
+    } else if (qualityLevels.includes('hd720')) {
+        player.setPlaybackQuality('hd720');
+    } else if (qualityLevels.includes('large')) { // large is 480p
+        player.setPlaybackQuality('large');
+    } else {
+        console.warn('Desired quality level not available. Default quality will be used.');
+    }
 }
 
 document.getElementById('prevBtn').addEventListener('click', () => {
