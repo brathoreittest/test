@@ -49,6 +49,28 @@ function onPlayerReady(event) {
 
 function onPlayerError(event) {
     console.error('Error occurred. Skipping to next video.');
+    handlePlayerError(event.data);
+}
+
+function handlePlayerError(errorCode) {
+    switch (errorCode) {
+        case 2: 
+            console.error('Invalid video ID.');
+            break;
+        case 5: 
+            console.error('HTML5 player error.');
+            break;
+        case 100: 
+            console.error('Video not found or removed.');
+            break;
+        case 101:
+        case 150: 
+            console.error('Embedding disabled or age-restricted video.');
+            break;
+        default:
+            console.error('Unknown error.');
+            break;
+    }
     loadNextVideo();
 }
 
