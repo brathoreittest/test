@@ -23,9 +23,10 @@ body {
 .controls {
     position: absolute;
     bottom: 20px;
+    left: 20px; /* Adjust this value to move the buttons to the left */
     display: flex;
-    justify-content: center;
-    width: 100%;
+    justify-content: flex-start; /* Align items to the start */
+    width: auto; /* Adjust width to fit content */
 }
 
 button {
