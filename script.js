@@ -23,6 +23,7 @@ function loadVideo() {
         console.error('No video IDs available to load.');
         return;
     }
+    const currentIndex = Math.floor(Math.random() * videoIds.length);
     const videoId = videoIds[currentIndex];
     const randomTime = Math.floor(Math.random() * 9000); // Random time between 0 and 9000 seconds
     console.log(`Loading video ID: ${videoId} at random time: ${randomTime} seconds`);
