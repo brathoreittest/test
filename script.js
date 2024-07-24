@@ -23,83 +23,28 @@ function loadVideo() {
         console.error('No video IDs available to load.');
         return;
     }
+    const currentIndex = Math.floor(Math.random() * videoIds.length);
     const videoId = videoIds[currentIndex];
-    console.log(`Loading video ID: ${videoId}`);
+    const randomTime = Math.floor(Math.random() * 5400); // Random time between 0 and 9000 seconds
+    console.log(`Loading video ID: ${videoId} at random time: ${randomTime} seconds`);
     if (player) {
-        player.loadVideoById(videoId);
+        player.loadVideoById({ videoId: videoId, startSeconds: randomTime });
     } else {
         player = new YT.Player('player', {
             height: '100%',
             width: '100%',
             videoId: videoId,
+            playerVars: { 'start': randomTime },
             events: {
-                'onReady': onPlayerReady,
-                'onError': onPlayerError,
-                'onStateChange': onPlayerStateChange
+                'onReady': onPlayerReady
             }
         });
     }
 }
 
 function onPlayerReady(event) {
-    console.log('Player is ready.');
-    const duration = player.getDuration();
-    if (duration > 0) {
-        const randomTime = Math.floor(Math.random() * duration);
-        console.log(`Starting video at random time: ${randomTime} seconds`);
-        event.target.seekTo(randomTime);
-        event.target.playVideo();
-    } else {
-        console.log('Duration not available yet, waiting...');
-    }
-}
-
-function onPlayerStateChange(event) {
-    if (event.data === YT.PlayerState.PLAYING) {
-        const duration = player.getDuration();
-        if (duration > 0) {
-            const randomTime = Math.floor(Math.random() * duration);
-            console.log(`Starting video at random time: ${randomTime} seconds`);
-            player.seekTo(randomTime);
-            player.playVideo();
-        }
-    }
-}
-
-function onPlayerError(event) {
-    console.error('Error occurred. Skipping to next video.');
-    handlePlayerError(event.data);
-}
-
-function handlePlayerError(errorCode) {
-    switch (errorCode) {
-        case 2:
-            console.error('Invalid video ID.');
-            break;
-        case 5:
-            console.error('HTML5 player error.');
-            break;
-        case 100:
-            console.error('Video not found or removed.');
-            break;
-        case 101:
-        case 150:
-            console.error('Embedding disabled or age-restricted video.');
-            break;
-        default:
-            console.error('Unknown error.');
-            break;
-    }
-    loadNextVideo();
-}
-
-function loadNextVideo() {
-    if (videoIds.length === 0) {
-        console.error('No video IDs available for navigation.');
-        return;
-    }
-    currentIndex = (currentIndex + 1) % videoIds.length;
-    loadVideo();
+    console.log('Player is ready. Starting video.');
+    event.target.playVideo();
 }
 
 document.getElementById('prevBtn').addEventListener('click', () => {
