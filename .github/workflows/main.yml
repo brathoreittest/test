@@ -1,0 +1,14 @@
+# .github/workflows/main.yml
+name: CI/CD Pipeline
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use API Key
+        run: echo "API Key is ${{ secrets.YOU_KEY }}"
