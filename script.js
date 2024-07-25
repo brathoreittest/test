@@ -12,7 +12,7 @@ function extractVideoID(url) {
 // Function to get video details
 async function getVideoDuration(videoId) {
     try {
-        const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoId}&key=${API_KEY}`);
+        const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoId}&key=AIzaSyDZEYh45-ytDReALsTFSw7jOMDC5uhyqJw`);
         const data = await response.json();
         if (data.items.length > 0) {
             const duration = data.items[0].contentDetails.duration;
