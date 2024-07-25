@@ -77,7 +77,8 @@ async function loadVideo() {
             videoId: videoId,
             playerVars: { 'start': randomTime },
             events: {
-                'onReady': onPlayerReady
+                'onReady': onPlayerReady,
+                'onError': onPlayerError
             }
         });
     }
@@ -86,6 +87,17 @@ async function loadVideo() {
 function onPlayerReady(event) {
     console.log('Player is ready. Starting video.');
     event.target.playVideo();
+}
+
+function onPlayerError(event) {
+    console.error('Error loading or playing video. Moving to next video.');
+    nextVideo();
+}
+
+function nextVideo() {
+    currentIndex = (currentIndex + 1) % videoIds.length;
+    console.log('Loading next video. Current index:', currentIndex);
+    loadVideo();
 }
 
 document.getElementById('prevBtn').addEventListener('click', () => {
@@ -103,7 +115,5 @@ document.getElementById('nextBtn').addEventListener('click', () => {
         console.error('No video IDs available for navigation.');
         return;
     }
-    currentIndex = (currentIndex + 1) % videoIds.length;
-    console.log('Next button clicked. Current index:', currentIndex);
-    loadVideo();
+    nextVideo();
 });
