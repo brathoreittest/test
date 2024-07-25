@@ -2,15 +2,48 @@ let player;
 let videoIds = [];
 let currentIndex = 0;
 
+// Function to extract video ID from a YouTube URL
+function extractVideoID(url) {
+    const regex = /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+}
+
+// Function to get video details
+async function getVideoDuration(videoId) {
+    try {
+        const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoId}&key=YOUR_API_KEY`);
+        const data = await response.json();
+        if (data.items.length > 0) {
+            const duration = data.items[0].contentDetails.duration;
+            return parseISO8601Duration(duration);
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching video details:', error);
+        return null;
+    }
+}
+
+// Function to parse ISO 8601 duration format
+function parseISO8601Duration(duration) {
+    const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+    const hours = parseInt(match[1]) || 0;
+    const minutes = parseInt(match[2]) || 0;
+    const seconds = parseInt(match[3]) || 0;
+    return (hours * 3600) + (minutes * 60) + seconds;
+}
+
 function onYouTubeIframeAPIReady() {
     console.log('YouTube IFrame API is ready.');
     fetch('videos.txt')
         .then(response => response.text())
-        .then(data => {
+        .then(async data => {
             videoIds = data.split('\n').map(id => id.trim()).filter(id => id !== '');
             console.log('Loaded video IDs:', videoIds);
             if (videoIds.length > 0) {
-                loadVideo();
+                await loadVideo();
             } else {
                 console.error('No video IDs found.');
             }
@@ -18,15 +51,23 @@ function onYouTubeIframeAPIReady() {
         .catch(error => console.error('Error loading video IDs:', error));
 }
 
-function loadVideo() {
+async function loadVideo() {
     if (videoIds.length === 0) {
         console.error('No video IDs available to load.');
         return;
     }
-    const currentIndex = Math.floor(Math.random() * videoIds.length);
+    
     const videoId = videoIds[currentIndex];
-    const randomTime = Math.floor(Math.random() * 5400); // Random time between 0 and 9000 seconds
+    const durationInSeconds = await getVideoDuration(videoId);
+    
+    if (durationInSeconds === null) {
+        console.error('Could not get duration for video ID:', videoId);
+        return;
+    }
+    
+    const randomTime = Math.floor(Math.random() * durationInSeconds); // Random time between 0 and video duration
     console.log(`Loading video ID: ${videoId} at random time: ${randomTime} seconds`);
+    
     if (player) {
         player.loadVideoById({ videoId: videoId, startSeconds: randomTime });
     } else {
