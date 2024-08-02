@@ -19,7 +19,7 @@
 
       function onYouTubeIframeAPIReady() {
         // Fetch video IDs from the videos.txt file
-        fetch('https://raw.githubusercontent.com/brathoreittest/test/main/videos.txt')
+        fetch('https://raw.githubusercontent.com/brathoreittest/test/main/hindivideos.txt')
           .then(response => response.text())
           .then(data => {
             videoIds = data.trim().split('\n').map(id => id.trim());
