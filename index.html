@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <body style="margin: 0; padding: 0;">
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100vh;">
+      <div id="player" style="width: 100%; height: 100%;"></div>
+      <button id="prev-video-btn" style="position: absolute; bottom: 0; left: 0; font-size: 24px; padding: 10px 20px;">Previous</button>
+      <button id="next-video-btn" style="position: absolute; bottom: 0; left: 220px; font-size: 24px; padding: 10px 30px;">Next </button>
+    </div>
+    <script>
+      var tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      var player;
+      var videoIds = []; // Initialize an empty array for video IDs
+      var currentVideoIndex = 0;
+      var videoCurrentTime = 0; // Store the current time of each video
+
+      function onYouTubeIframeAPIReady() {
+        // Fetch video IDs from the videos.txt file
+        fetch('https://raw.githubusercontent.com/brathoreittest/test/main/videos.txt')
+          .then(response => response.text())
+          .then(data => {
+            videoIds = data.trim().split('\n').map(id => id.trim());
+            // Initialize the current video index
+            currentVideoIndex = Math.floor(Math.random() * videoIds.length);
+            // Initialize the YouTube player
+            player = new YT.Player('player', {
+              videoId: videoIds[currentVideoIndex],
+              playerVars: {
+                'autoplay': 1,
+                'playsinline': 1,
+                'controls': 1,
+                'vq': 'hd720', // Set minimum quality to 720p
+                'fs': 1 // Enable full screen
+              },
+              events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange,
+                'onError': onPlayerError
+              }
+            });
+          });
+      }
+
+      function onPlayerReady(event) {
+        event.target.playVideo();
+      }
+
+      function onPlayerStateChange(event) {
+        if (event.data == YT.PlayerState.ENDED) {
+          playNextVideo();
+        }
+      }
+
+      function onPlayerError(event) {
+        if (event.data == 2 || event.data == 5 || event.data == 100 || event.data == 101 || event.data == 150) {
+          playNextVideo();
+        }
+      }
+
+      function playNextVideo() {
+        // Fetch a random video ID from the videoIds array
+        const randomIndex = Math.floor(Math.random() * videoIds.length);
+        const nextVideoId = videoIds[randomIndex];
+        player.loadVideoById({
+          videoId: nextVideoId
+        });
+        // Wait for the video metadata to load
+        setTimeout(function() {
+          var videoDuration = player.getDuration();
+          var startTime = Math.floor(Math.random() * videoDuration);
+          player.seekTo(startTime);
+        }, 1000); // Wait 1 second for metadata to load
+      }
+
+      function playPrevVideo() {
+        currentVideoIndex = (currentVideoIndex - 1 + videoIds.length) % videoIds.length;
+        player.loadVideoById({
+          videoId: videoIds[currentVideoIndex]
+        });
+        // Seek to the previous video's current time
+        player.seekTo(videoCurrentTime);
+      }
+
+      function updateVideoCurrentTime() {
+        videoCurrentTime = player.getCurrentTime();
+      }
+
+      // Update the current time of the video every second
+      setInterval(updateVideoCurrentTime, 1000);
+
+      document.getElementById('next-video-btn').addEventListener('click', playNextVideo);
+      document.getElementById('prev-video-btn').addEventListener('click', playPrevVideo);
+    </script>
+  </body>
+</html>
