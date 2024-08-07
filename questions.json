@@ -24,5 +24,4 @@
         "choices": ["William Shakespeare", "Charles Dickens", "Mark Twain", "Jane Austen"],
         "correctAnswer": 0
     }
-    // Add more questions as needed
 ]
