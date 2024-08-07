@@ -1,109 +1,149 @@
 [
-    {
-        "question": "What is the capital of France?",
-        "choices": ["Paris", "London", "Berlin", "Madrid"],
-        "correctAnswer": 0
-    },
-    {
-        "question": "What is 2 + 2?",
-        "choices": ["3", "4", "5", "6"],
-        "correctAnswer": 1
-    },
-    {
-        "question": "Which planet is known as the Red Planet?",
-        "choices": ["Earth", "Mars", "Jupiter", "Venus"],
-        "correctAnswer": 1
-    },
-    {
-        "question": "What materials are needed to make the bird feeder?",
-        "choices": [
-            "Plastic bottle, scissors, pen knife, string, and two wooden sticks",
-            "Glass bottle, scissors, pen knife, string, and two wooden sticks",
-            "Plastic bottle, scissors, paper knife, string, and two metal rods",
-            "Plastic bottle, knife, string, and two wooden sticks"
-        ],
-        "correctAnswer": 0
-    },
-    {
-        "question": "Where should you make the first set of holes in the bottle?",
-        "choices": [
-            "In the neck of the bottle",
-            "On either side of the bottle",
-            "At the bottom of the bottle",
-            "On the bottle cap"
-        ],
-        "correctAnswer": 1
-    },
-    {
-        "question": "What should be inserted into the holes made on either side of the bottle?",
-        "choices": [
-            "String",
-            "Pen knife",
-            "Wooden sticks",
-            "Scissors"
-        ],
-        "correctAnswer": 2
-    },
-    {
-        "question": "Why do you need to make small holes in the bottle?",
-        "choices": [
-            "To insert the string",
-            "For the birds to peck",
-            "To hang the bottle",
-            "To fill the bottle with seeds"
-        ],
-        "correctAnswer": 1
-    },
-    {
-        "question": "Where should you make two additional holes in the bottle?",
-        "choices": [
-            "At the bottom of the bottle",
-            "In the neck of the bottle",
-            "In the middle of the bottle",
-            "On the cap of the bottle"
-        ],
-        "correctAnswer": 1
-    },
-    {
-        "question": "What is the final step in making the bird feeder?",
-        "choices": [
-            "Fill the bottle with seeds and hang it in a place where birds will come",
-            "Insert the wooden sticks",
-            "Make holes on the sides of the bottle",
-            "Cut the bottle into two halves"
-        ],
-        "correctAnswer": 0
-    },
-    {
-        "question": "True or False: The bird feeder is made from a glass bottle.",
-        "choices": [
-            "True",
-            "False"
-        ],
-        "correctAnswer": 1
-    },
-    {
-        "question": "True or False: You need to insert a string through the holes in the neck of the bottle to hang the bird feeder.",
-        "choices": [
-            "True",
-            "False"
-        ],
-        "correctAnswer": 0
-    },
-    {
-        "question": "True or False: The wooden sticks are used to make the holes in the bottle.",
-        "choices": [
-            "True",
-            "False"
-        ],
-        "correctAnswer": 1
-    },
-    {
-        "question": "True or False: The bottle should be filled with seeds before it is hung.",
-        "choices": [
-            "True",
-            "False"
-        ],
-        "correctAnswer": 0
-    }
+  {
+    "question": "How many heads does a Pushmi-Pullyu have?",
+    "choices": ["One", "Two", "Three", "Four"],
+    "correctAnswer": 1
+  },
+  {
+    "question": "What feature makes the Pushmi-Pullyu difficult to catch?",
+    "choices": ["Its speed", "Its size", "Its unique ability", "Its camouflage"],
+    "correctAnswer": 2
+  },
+  {
+    "question": "Where did Pushmi-Pullyus live?",
+    "choices": ["Africa", "Asia", "South America", "unknown location"],
+    "correctAnswer": 3
+  },
+  {
+    "question": "Are Pushmi-Pullyus still alive today?",
+    "choices": ["Yes", "No", "Unknown"],
+    "correctAnswer": 1
+  },
+  {
+    "question": "What is Dr. Dolittle's special ability?",
+    "choices": ["Talking to animals", "Flying", "Invisibility", "Super strength"],
+    "correctAnswer": 0
+  },
+  {
+    "question": "What kind of work does Dr. Dolittle do?",
+    "choices": ["Doctor", "Farmer", "Explorer", "Teacher"],
+    "correctAnswer": 0
+  },
+  {
+    "question": "What is the name of the book series featuring Dr. Dolittle?",
+    "choices": ["The Chronicles of Narnia", "Harry Potter", "The Lord of the Rings", "Doctor Dolittle"],
+    "correctAnswer": 3
+  },
+  {
+    "question": "Who is the author of the Dr. Dolittle series?",
+    "choices": ["J.K. Rowling", "C.S. Lewis", "J.R.R. Tolkien", "Hugh Lofting"],
+    "correctAnswer": 3
+  },
+  {
+    "question": "What is the capital of France?",
+    "choices": ["Paris", "London", "Berlin", "Madrid"],
+    "correctAnswer": 0
+  },
+  {
+    "question": "What is 2 + 2?",
+    "choices": ["3", "4", "5", "6"],
+    "correctAnswer": 1
+  },
+  {
+    "question": "Which planet is known as the Red Planet?",
+    "choices": ["Earth", "Mars", "Jupiter", "Venus"],
+    "correctAnswer": 1
+  },
+  {
+    "question": "What materials are needed to make the bird feeder?",
+    "choices": [
+      "Plastic bottle, scissors, pen knife, string, and two wooden sticks",
+      "Glass bottle, scissors, pen knife, string, and two wooden sticks",
+      "Plastic bottle, scissors, paper knife, string, and two metal rods",
+      "Plastic bottle, knife, string, and two wooden sticks"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "question": "Where should you make the first set of holes in the bottle?",
+    "choices": [
+      "In the neck of the bottle",
+      "On either side of the bottle",
+      "At the bottom of the bottle",
+      "On the bottle cap"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "question": "What should be inserted into the holes made on either side of the bottle?",
+    "choices": [
+      "String",
+      "Pen knife",
+      "Wooden sticks",
+      "Scissors"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "question": "Why do you need to make small holes in the bottle?",
+    "choices": [
+      "To insert the string",
+      "For the birds to peck",
+      "To hang the bottle",
+      "To fill the bottle with seeds"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "question": "Where should you make two additional holes in the bottle?",
+    "choices": [
+      "At the bottom of the bottle",
+      "In the neck of the bottle",
+      "In the middle of the bottle",
+      "On the cap of the bottle"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "question": "What is the final step in making the bird feeder?",
+    "choices": [
+      "Fill the bottle with seeds and hang it in a place where birds will come",
+      "Insert the wooden sticks",
+      "Make holes on the sides of the bottle",
+      "Cut the bottle into two halves"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "question": "True or False: The bird feeder is made from a glass bottle.",
+    "choices": [
+      "True",
+      "False"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "question": "True or False: You need to insert a string through the holes in the neck of the bottle to hang the bird feeder.",
+    "choices": [
+      "True",
+      "False"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "question": "True or False: The wooden sticks are used to make the holes in the bottle.",
+    "choices": [
+      "True",
+      "False"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "question": "True or False: The bottle should be filled with seeds before it is hung.",
+    "choices": [
+      "True",
+      "False"
+    ],
+    "correctAnswer": 0
+  }
 ]
